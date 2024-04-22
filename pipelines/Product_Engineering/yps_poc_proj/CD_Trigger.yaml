@@ -1,0 +1,83 @@
+pipeline:
+  name: CD_Trigger
+  identifier: CD_Trigger
+  projectIdentifier: yps_poc_proj
+  orgIdentifier: Product_Engineering
+  tags: {}
+  stages:
+    - stage:
+        name: test_CD
+        identifier: test_CD
+        description: ""
+        type: Deployment
+        spec:
+          deploymentType: Kubernetes
+          service:
+            serviceRef: test_service
+            serviceInputs:
+              serviceDefinition:
+                type: Kubernetes
+                spec:
+                  artifacts:
+                    primary:
+                      primaryArtifactRef: <+input>
+                      sources: <+input>
+          environment:
+            environmentRef: harnessdeven
+            deployToAll: false
+            infrastructureDefinitions:
+              - identifier: harness_k8sinfra
+          execution:
+            steps:
+              - step:
+                  type: Container
+                  name: Test container
+                  identifier: Test_container
+                  spec:
+                    connectorRef: DKRhubpersonalyps
+                    image: yashpalsingh3737/ci_tutorial_repo:<+lastPublished.tag>
+                    command: |-
+                      echo "Hello <+pipeline.sequenceId>"
+                      echo <+infra.folder>
+                    shell: Sh
+                    infrastructure:
+                      type: KubernetesDirect
+                      spec:
+                        connectorRef: cdclusterpersonal
+                        namespace: test-ns
+                        resources:
+                          limits:
+                            cpu: "0.5"
+                            memory: 500Mi
+                        annotations: {}
+                        labels: {}
+                        containerSecurityContext:
+                          capabilities:
+                            drop: []
+                            add: []
+                        nodeSelector: {}
+                    reports:
+                      type: JUnit
+                      spec:
+                        paths: []
+                    outputVariables: []
+                    envVariables: {}
+                  timeout: 10m
+              - step:
+                  type: Email
+                  name: Email_1
+                  identifier: Email_1
+                  spec:
+                    to: yash.singh@harness.io
+                    cc: ""
+                    subject: "Pipeline_name: <+pipeline.name> and Status: <+pipeline.status>"
+                    body: <+account.name> \n <+org.identifier> \t\t <+org.name>
+                  timeout: 10m
+            rollbackSteps: []
+        tags: {}
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: Abort
