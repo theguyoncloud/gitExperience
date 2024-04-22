@@ -1,0 +1,15 @@
+infrastructureDefinition:
+  name: test
+  identifier: test
+  orgIdentifier: Product_Engineering
+  projectIdentifier: yps_poc_proj
+  environmentRef: harnessdeven
+  deploymentType: Ssh
+  type: Pdc
+  spec:
+    connectorRef: testpdc
+    credentialsRef: account.SSHDemoCred
+    hostFilter:
+      type: All
+      spec: {}
+  allowSimultaneousDeployments: false

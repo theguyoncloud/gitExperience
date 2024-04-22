@@ -1,0 +1,66 @@
+pipeline:
+  name: Image_Scan
+  identifier: Image_Scan
+  projectIdentifier: yps_poc_proj
+  orgIdentifier: Product_Engineering
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: CIPHERTron
+        repoName: harness-yarn-demo
+        build: <+input>
+  stages:
+    - stage:
+        name: Image Scan
+        identifier: Image_Scan
+        type: SecurityTests
+        spec:
+          cloneCodebase: true
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: Save Scan Results
+                  identifier: Save_Scan_Results
+                  spec:
+                    connectorRef: account.Pritish_Harness
+                    image: redhat/ubi8-minimal:latest
+                    shell: Sh
+                    command: |-
+                      apt-get update -y  
+                      apt-get install wget apt-transport-https gnupg lsb-release -y  
+                      wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | apt-key add -  
+                      echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | tee -a /etc/apt/sources.list.d/trivy.list  
+                      apt-get update -y  
+                      apt-get install trivy -y  
+                      trivy -v  
+                      trivy -q image --timeout 20m -f json -o /shared/customer_artifacts/aqua.json redhat/ubi8-minimal:latest
+              - step:
+                  type: Security
+                  name: Ingest_security_results
+                  identifier: Ingest_security_results
+                  spec:
+                    privileged: true
+                    settings:
+                      policy_type: ingestionOnly
+                      scan_type: container
+                      product_name: aqua-trivy
+                      product_config_name: default
+                      customer_artifacts_path: /shared/customer_artifacts
+                      manual_upload_filename: aqua.json
+                      container_type: docker_v2
+                      container_project: redhat/ubi8-minimal
+                      container_tag: latest
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          sharedPaths:
+            - /var/run
+            - /shared/customer_artifacts/
+          caching:
+            enabled: false
+            paths: []

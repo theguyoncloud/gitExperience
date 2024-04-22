@@ -1,0 +1,20 @@
+service:
+  name: test_service
+  identifier: test_service
+  serviceDefinition:
+    type: Kubernetes
+    spec:
+      artifacts:
+        primary:
+          primaryArtifactRef: <+input>
+          sources:
+            - spec:
+                connectorRef: DKRhubpersonalyps
+                imagePath: yashpalsingh3737/ci_tutorial_repo
+                tag: <+input>
+                digest: ""
+              identifier: test_image
+              type: DockerRegistry
+  gitOpsEnabled: false
+  orgIdentifier: Product_Engineering
+  projectIdentifier: yps_poc_proj

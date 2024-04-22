@@ -1,0 +1,81 @@
+pipeline:
+  name: test-mcafee-case
+  identifier: testmcafeecase
+  projectIdentifier: yps_poc_proj
+  orgIdentifier: Product_Engineering
+  tags: {}
+  stages:
+    - stage:
+        name: test-mcafee
+        identifier: testmcafee
+        description: ""
+        type: Deployment
+        spec:
+          deploymentType: Ssh
+          service:
+            serviceRef: testmcafee
+          environment:
+            environmentRef: awspreprodrestricted
+            deployToAll: false
+            infrastructureDefinitions:
+              - identifier: ypsrestricted_aws
+                inputs:
+                  identifier: ypsrestricted_aws
+                  type: SshWinRmAws
+                  spec:
+                    targetedHosts: <+input>
+          execution:
+            steps:
+              - step:
+                  type: ShellScript
+                  name: ShellScript_1
+                  identifier: ShellScript_1
+                  spec:
+                    shell: Bash
+                    executionTarget:
+                      host: 172.31.10.116
+                      connectorRef: sshypsrestrictedaws
+                      workingDirectory: /home/ec2-user
+                    source:
+                      type: Inline
+                      spec:
+                        script: |-
+                          whoami
+                          ls -l
+                          pwd
+                          echo "testing mcafee case" >> test.txt
+                          ls -l
+                    environmentVariables: []
+                    outputVariables: []
+                    delegateSelectors:
+                      - dkr-del-yps-aws
+                  timeout: 10m
+            rollbackSteps:
+              - step:
+                  name: Rollback
+                  identifier: Rollback
+                  timeout: 10m
+                  strategy:
+                    repeat:
+                      items: <+stage.output.hosts>
+                  template:
+                    templateRef: account.Default_Install_Jar_Bash
+                    templateInputs:
+                      type: Command
+                      spec:
+                        environmentVariables:
+                          - name: DestinationDirectory
+                            type: String
+                            value: $HOME/<+service.name>/<+env.name>
+                          - name: WorkingDirectory
+                            type: String
+                            value: $HOME/<+service.name>/<+env.name>/tomcat/bin
+        tags: {}
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: StageRollback
+        delegateSelectors:
+          - dkr-del-yps-aws

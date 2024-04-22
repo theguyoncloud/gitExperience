@@ -1,0 +1,25 @@
+service:
+  name: harnessguestbook
+  identifier: harnessguestbook
+  orgIdentifier: Product_Engineering
+  projectIdentifier: yps_poc_proj
+  tags:
+    cd demo: ""
+  serviceDefinition:
+    type: Kubernetes
+    spec:
+      manifests:
+        - manifest:
+            identifier: guestbook
+            type: K8sManifest
+            spec:
+              store:
+                type: Github
+                spec:
+                  connectorRef: harnessgitconnector_yps
+                  gitFetchType: Branch
+                  paths:
+                    - guestbook/guestbook-ui-deployment.yaml
+                    - guestbook/guestbook-ui-svc.yaml
+                  branch: master
+  gitOpsEnabled: false

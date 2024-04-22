@@ -1,0 +1,8 @@
+environment:
+  name: test_pre-prod
+  identifier: test_preprod
+  description: ""
+  tags: {}
+  type: PreProduction
+  orgIdentifier: Product_Engineering
+  projectIdentifier: yps_poc_proj

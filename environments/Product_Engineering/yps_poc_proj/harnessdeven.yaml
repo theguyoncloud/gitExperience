@@ -1,0 +1,9 @@
+environment:
+  name: harnessdeven
+  identifier: harnessdeven
+  accountId: 6_vVHzo9Qeu9fXvj-AcbCQ
+  orgIdentifier: Product_Engineering
+  projectIdentifier: yps_poc_proj
+  description: ""
+  tags: {}
+  type: PreProduction

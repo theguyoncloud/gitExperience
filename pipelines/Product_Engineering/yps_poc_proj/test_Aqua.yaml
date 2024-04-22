@@ -1,0 +1,76 @@
+pipeline:
+  name: test_Aqua
+  identifier: test_Aqua
+  projectIdentifier: yps_poc_proj
+  orgIdentifier: Product_Engineering
+  tags: {}
+  stages:
+    - stage:
+        name: test_scan
+        identifier: test_scan
+        description: ""
+        type: SecurityTests
+        spec:
+          cloneCodebase: false
+          infrastructure:
+            type: KubernetesDirect
+            spec:
+              connectorRef: cibuildcluster
+              namespace: test-ns
+              automountServiceAccountToken: true
+              nodeSelector: {}
+              os: Linux
+          execution:
+            steps:
+              - step:
+                  type: Background
+                  name: Background_1
+                  identifier: Background_1
+                  spec:
+                    connectorRef: DKRhubpersonalyps
+                    image: docker:dind
+                    shell: Sh
+                    privileged: true
+                    entrypoint:
+                      - dockerd
+              - step:
+                  type: Run
+                  name: Run_1
+                  identifier: Run_1
+                  spec:
+                    connectorRef: DKRhubpersonalyps
+                    image: docker:dind
+                    shell: Sh
+                    command: |-
+                      echo <+trigger.payload>
+                      echo <+trigger.payload.artifactData.build>
+              - step:
+                  type: AquaTrivy
+                  name: AquaTrivy_1
+                  identifier: AquaTrivy_1
+                  spec:
+                    mode: orchestration
+                    config: default
+                    target:
+                      type: container
+                      name: <+input>
+                      variant: <+lastPublished.tag>
+                    advanced:
+                      log:
+                        level: info
+                    privileged: true
+                    image:
+                      type: docker_v2
+                      name: yashpalsingh3737/ci_tutorial_repo
+                      access_id: yashpalsingh3737
+                      access_token: <+secret.getValue("project.dkrhubypspersonalsecret")>
+                      tag: <+input>
+                    sbom:
+                      format: spdx-json
+          sharedPaths:
+            - /var/run
+          caching:
+            enabled: false
+            paths: []
+          slsa_provenance:
+            enabled: false

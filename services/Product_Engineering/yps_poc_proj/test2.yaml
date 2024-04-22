@@ -1,0 +1,25 @@
+service:
+  name: test2
+  identifier: test2
+  orgIdentifier: Product_Engineering
+  projectIdentifier: yps_poc_proj
+  serviceDefinition:
+    spec:
+      manifests:
+        - manifest:
+            identifier: test2_multimanifest
+            type: K8sManifest
+            spec:
+              store:
+                type: Github
+                spec:
+                  connectorRef: github_personal_cd_conn
+                  gitFetchType: Branch
+                  paths:
+                    - guestbook/guestbook-ui-deployment.yaml
+                    - guestbook/guestbook-ui-deployment1.yaml
+                  repoName: harnesscd-example-apps
+                  branch: main
+              skipResourceVersioning: false
+              enableDeclarativeRollback: false
+    type: Kubernetes

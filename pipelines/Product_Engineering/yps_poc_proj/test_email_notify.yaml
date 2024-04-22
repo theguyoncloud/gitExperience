@@ -1,0 +1,112 @@
+pipeline:
+  name: test_email_notify
+  identifier: test_email_notify
+  projectIdentifier: yps_poc_proj
+  orgIdentifier: Product_Engineering
+  tags: {}
+  stages:
+    - stage:
+        name: timeToWait
+        identifier: timeToWait
+        description: ""
+        type: Approval
+        spec:
+          execution:
+            steps:
+              - step:
+                  type: ShellScript
+                  name: ShellScript_1
+                  identifier: ShellScript_1
+                  spec:
+                    shell: Bash
+                    onDelegate: true
+                    source:
+                      type: Inline
+                      spec:
+                        script: |+
+                          current_hour=$(date +%H)
+                          echo $current_hour
+                          if ((current_hour < 12 || current_hour >= 16)); then 
+                              current_timestamp=$(date +%s)
+                              tomorrow_timestamp=$(date -d "tomorrow 10:00" +%s)
+                              time_difference=$((tomorrow_timestamp-current_timestamp))
+                              echo "time left for execution in seconds"
+                              time_difference="${time_difference}s"
+                              echo $time_difference
+                          else
+                              echo "Current time is between 10AM and 7PM"
+                              time_difference="10s"
+                              echo $time_difference
+                          fi
+
+                    environmentVariables: []
+                    outputVariables:
+                      - name: time_difference
+                        type: String
+                        value: time_difference
+                    delegateSelectors:
+                      - k8s-del-22nov-yps
+                  timeout: 10m
+              - step:
+                  type: Wait
+                  name: Wait_1
+                  identifier: Wait_1
+                  spec:
+                    duration: <+pipeline.stages.timeToWait.spec.execution.steps.ShellScript_1.output.outputVariables.time_difference>
+        tags: {}
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: Abort
+        delegateSelectors:
+          - k8s-del-22nov-yps
+    - stage:
+        name: test_email_notify
+        identifier: test_email_notify
+        description: |-
+          This pipeline was created to answer a cx query to how to format email body as per the need.
+
+          https://developer.harness.io/docs/continuous-delivery/x-platform-cd-features/cd-steps/utilities/email_step/#body
+        type: Custom
+        spec:
+          execution:
+            steps:
+              - step:
+                  type: ShellScript
+                  name: ShellScript_1
+                  identifier: ShellScript_1
+                  spec:
+                    shell: Bash
+                    executionTarget: {}
+                    source:
+                      type: Inline
+                      spec:
+                        script: |-
+                          hello="<+secrets.getValue("test1")>"
+                          cat $hello
+                          export hello
+                    environmentVariables: []
+                    outputVariables:
+                      - name: hello
+                        type: String
+                        value: hello
+                  timeout: 10m
+              - step:
+                  type: Email
+                  name: Email_1
+                  identifier: Email_1
+                  spec:
+                    to: yash.singh@harness.io
+                    cc: ""
+                    subject: "Pipeline_name: <+pipeline.name> and Status: <+pipeline.status>"
+                    body: "<p>Hi Team,    Deployment_stage_status:</p> </br> <p><+pipeline.name> : <+pipeline.status></p>"
+                  timeout: 10m
+        tags: {}
+  delegateSelectors:
+    - k8s-del-22nov-yps
+  flowControl:
+    barriers:
+      - name: test
+        identifier: test

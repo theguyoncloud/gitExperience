@@ -1,0 +1,85 @@
+pipeline:
+  name: yarn-demo
+  identifier: yarndemo
+  projectIdentifier: yps_poc_proj
+  orgIdentifier: Product_Engineering
+  tags: {}
+  stages:
+    - stage:
+        name: build
+        identifier: build
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: yarn install
+                  identifier: yarn_install
+                  spec:
+                    shell: Sh
+                    command: yarn install --frozen-lockfile
+              - step:
+                  type: Run
+                  name: yarn lint
+                  identifier: yarn_lint
+                  spec:
+                    shell: Sh
+                    command: yarn lint
+              - step:
+                  type: Run
+                  name: yarn build
+                  identifier: Build_JavaScript_App
+                  spec:
+                    shell: Sh
+                    command: |
+                      yarn build
+              - step:
+                  identifier: run_unit_tests
+                  type: Run
+                  name: yarn test
+                  spec:
+                    shell: Sh
+                    command: |-
+                      pwd
+                      ls -lr
+                      yarn test
+                    reports:
+                      type: JUnit
+                      spec:
+                        paths:
+                          - src/testCoverage/junit.xml
+                  failureStrategies:
+                    - onFailure:
+                        errors:
+                          - AllErrors
+                        action:
+                          type: Ignore
+              - step:
+                  type: S3Upload
+                  name: Upload to S3
+                  identifier: S3Upload_1
+                  spec:
+                    connectorRef: pritish_aws
+                    region: us-east-2
+                    bucket: pritish-harness-bucket
+                    sourcePath: build/*
+                    target: yarn-artifacts
+          caching:
+            enabled: false
+            paths: []
+          slsa_provenance:
+            enabled: false
+  properties:
+    ci:
+      codebase:
+        connectorRef: CIPHERTron
+        repoName: harness-yarn-demo
+        build: <+input>

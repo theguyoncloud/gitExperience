@@ -1,0 +1,58 @@
+pipeline:
+  projectIdentifier: yps_poc_proj
+  orgIdentifier: Product_Engineering
+  stages:
+    - stage:
+        identifier: build
+        type: CI
+        name: build
+        spec:
+          cloneCodebase: false
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Background
+                  name: harnessmysql
+                  identifier: harnessmysql
+                  spec:
+                    connectorRef: DKRhubpersonalyps
+                    image: mysql
+                    shell: Bash
+                    command: hostname
+                    envVariables:
+                      MYSQL_DATABASE: legacy
+                      MYSQL_ROOT_PASSWORD: password123
+                    portBindings:
+                      "3306": "3306"
+                    imagePullPolicy: IfNotPresent
+              - step:
+                  type: Run
+                  name: Run_2
+                  identifier: Run_2
+                  spec:
+                    shell: Sh
+                    command: |
+                      sleep 60
+                      #telnet localhost 3306
+                      #service mysql start
+                      #systemctl status mysql
+                      #sleep 20
+                      #systemctl status mysql
+                      #sudo systemctl start mysql
+                      # mysql -h localhost -P 3306 -D legacy
+                      #mysql -h harnessmysql -P 3306 -u root -D legacy
+                      #mysql -h legacy -P 3306 -u root -D legacy
+                      mysql -h harnessmysql:3306 -u root --password=password123 --execute="SELECT VERSION();"
+                    privileged: true
+                    runAsUser: "0"
+        description: ""
+  tags: {}
+  identifier: Broken_Pipeline_MySQL_Required_updated_Clone_Clone
+  description: This is a simple Integration Stage Pipeline.
+  name: MySQL Background Testing - hostname
