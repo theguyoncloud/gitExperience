@@ -1,0 +1,18 @@
+infrastructureDefinition:
+  name: yps-restricted aws
+  identifier: ypsrestricted_aws
+  orgIdentifier: Product_Engineering
+  projectIdentifier: yps_poc_proj
+  environmentRef: awspreprodrestricted
+  deploymentType: Ssh
+  type: SshWinRmAws
+  spec:
+    credentialsRef: sshypsrestrictedaws
+    connectorRef: ypsrestrictedaws
+    region: ap-south-1
+    awsInstanceFilter:
+      tags: {}
+    hostConnectionType: PublicIP
+    instanceType: Aws
+    targetedHosts: <+input>
+  allowSimultaneousDeployments: false
