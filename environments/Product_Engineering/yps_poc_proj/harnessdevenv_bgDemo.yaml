@@ -1,0 +1,9 @@
+environment:
+  name: harnessdevenv_bgDemo
+  identifier: harnessdevenv_bgDemo
+  description: ""
+  tags: {}
+  type: PreProduction
+  orgIdentifier: Product_Engineering
+  projectIdentifier: yps_poc_proj
+  variables: []
