@@ -1,0 +1,64 @@
+name: <+service.name>
+image: <+artifact.image>
+environment: <+env.name>
+version: <+artifact.tag>
+canary: true
+
+#health check liveness readiness
+
+readiness_path: /healthcheck
+readiness_port: admin
+readiness_initial_delay: 30
+
+
+dd_enabled: true
+
+env:
+  config:
+    ALLOWED_ORIGINS: "*"
+    ELK_URL: https://se-elasticsearch-es-http.tools.svc:9200/
+    ELK_INDEX: <+service.name>
+    NEW_RELIC_LICENSE_KEY: abcdef
+    NEW_RELIC_APP_NAME: "ff-cv-demo"
+    ET_COLLECTOR_URL: https://app.harness.io/gratis/et-collector/
+    ET_APPLICATION_NAME: <+service.identifier> 
+    # bankingcvffdemo
+    ET_DEPLOYMENT_NAME: <+artifact.tag>
+    ET_ENV_ID: <+env.name>
+    ET_ACCOUNT_ID: <+account.identifier>
+    ET_ORG_ID: <+org.identifier>
+    ET_PROJECT_ID: <+project.identifier>
+    DD_ENV: <+env.name>
+    DD_SERVICE: <+service.name>
+    DD_VERSION: <+artifact.tag>
+    DD_PROFILING_ENABLED: "true"
+    DD_LOGS_INJECTION: "true"
+    DD_APPSEC_ENABLED: "true"
+    DD_LOG_LEVEL: "TRACE"
+    DD_TRACE_STARTUP_LOGS: true
+    ENABLE_APPDYNAMICS: false
+    APPDYNAMICS_AGENT_APPLICATION_NAME: banking-validation-app-<+env.name>
+    FF_API_KEY: <+pipeline.variables.FF_Key>
+    ELK_PASS: "ApiKey NDhVb2xvUUJrVXZVUHZqalNqek06UVhxLWpHdWFSZ2FhSWxmXzJlNlNLZw=="
+  secret:
+    MONGO_AUTH_LOCAL: "bW9uZ29kYitzcnY6Ly9iYW5raW5nLWRlbW86ZnkzM1oybE9semo5b3FrQ0BiYW5raW5nLm51OGx6c3YubW9uZ29kYi5uZXQvP3JldHJ5V3JpdGVzPXRydWUmdz1tYWpvcml0eQo="
+    MONGO_AUTH: "bW9uZ29kYitzcnY6Ly9iYW5raW5nLWRlbW86ZnkzM1oybE9semo5b3FrQ0BiYW5raW5nLm51OGx6c3YubW9uZ29kYi5uZXQvP3JldHJ5V3JpdGVzPXRydWUmdz1tYWpvcml0eQo="
+
+namespace: <+infra.namespace>
+createNamespace: true
+
+
+# Virtual path, ex payments-validation.harness-demo.site/<virtualPath>
+virtualPath: <+pipeline.variables.virtualPath>
+
+# Service Type allow you to specify what kind of service you want.
+# Possible values for ServiceType are:
+# ClusterIP | NodePort | LoadBalancer | ExternalName
+serviceType: ClusterIP
+
+# A Service can map an incoming port to any targetPort.
+# targetPort is where application is listening on inside the container.
+servicePort: 80
+serviceTargetPort: 8080
+# DNS
+defineHost: "payments-validation.harness-demo.site"

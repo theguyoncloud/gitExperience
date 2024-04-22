@@ -1,0 +1,17 @@
+# harness.io/skip-file-for-deploy
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: my-display-services-job
+  namespace: se-sandbox-ng-delegate
+spec:
+  template:
+    spec:
+      containers:
+      - name: my-display-services-container
+        image: lachlanevenson/k8s-kubectl:latest
+        command: ["/bin/sh"]
+        args: ["-c", "kubectl get svc -n se-sandbox-ng-delegate -o jsonpath='{range .items[*]}{.metadata.name} {.spec.clusterIP} {.status.loadBalancer.ingress[*].ip} {end}'"]
+      restartPolicy: Never
+  backoffLimit: 1

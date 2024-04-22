@@ -1,0 +1,45 @@
+name: <+pipeline.stages.Build.spec.execution.steps.Teste_Unitario.output.outputVariables.image_name>
+image: <+artifact.image>
+environment: <+env.name>
+version: <+artifact.tag>
+canary: true
+
+
+readiness_path: /config
+readiness_port: http
+readiness_initial_delay: 120
+
+
+dd_enabled: true
+
+env:
+  config:
+    ALLOWED_ORIGINS: "*"
+    ELK_URL: https://se-elasticsearch-es-http.tools.svc:9200/
+    ELK_INDEX: <+pipeline.stages.Build.spec.execution.steps.Teste_Unitario.output.outputVariables.image_name>-<+env.name>
+    NEW_RELIC_LICENSE_KEY: abcdef
+    NEW_RELIC_APP_NAME: "ff-cv-demo"
+    ET_COLLECTOR_URL: https://app.harness.io/gratis/et-collector/
+    ET_APPLICATION_NAME: <+service.identifier> 
+    # bankingcvffdemo
+    ET_DEPLOYMENT_NAME: <+artifact.tag>
+    ET_ENV_ID: <+env.name>
+    ET_ACCOUNT_ID: <+account.identifier>
+    ET_ORG_ID: <+org.identifier>
+    ET_PROJECT_ID: <+project.identifier>
+    DD_ENV: <+env.name>
+    DD_SERVICE: <+pipeline.stages.Build.spec.execution.steps.Teste_Unitario.output.outputVariables.image_name>
+    DD_VERSION: <+artifact.tag>
+    DD_PROFILING_ENABLED: "true"
+    DD_LOGS_INJECTION: "true"
+    DD_APPSEC_ENABLED: "true"
+    DD_LOG_LEVEL: "TRACE"
+    DD_TRACE_STARTUP_LOGS: true
+    ENABLE_APPDYNAMICS: true
+    APPDYNAMICS_AGENT_APPLICATION_NAME: srm-demo-app-<+env.name>
+    FF_KEY: "e37b57a9-a49d-4e29-97b4-1848136dd487"
+    ELK_PASS: "ApiKey YjFxcHk0UUJJT21YREZDV09UcEo6MzJHZWNOVmJSTVNLZkFveFFaaFRNQQ=="
+      
+
+namespace: <+infra.namespace>
+createNamespace: true

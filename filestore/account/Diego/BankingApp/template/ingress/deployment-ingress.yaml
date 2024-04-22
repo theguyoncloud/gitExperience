@@ -1,0 +1,113 @@
+{{- if .Values.createNamespace}}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{.Values.namespace}}
+---
+{{- end}}
+{{- if .Values.env.config}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{.Values.name}}
+data:
+{{.Values.env.config | toYaml | indent 2}}
+---
+{{- end}}
+
+{{- if .Values.env.secret}}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{.Values.name}}
+data:
+{{.Values.env.secret | toYaml | indent 2}}
+---
+{{- end}}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.name}}
+  labels:
+    app: {{.Values.name}}
+    tags.datadoghq.com/env: {{ .Values.environment  }}
+    tags.datadoghq.com/service: {{.Values.name  }}
+    tags.datadoghq.com/version: {{substr 0 63 .Values.version  }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{.Values.name}}
+  template:
+    metadata:
+      labels:
+        app: {{.Values.name}}
+        tags.datadoghq.com/env: {{ .Values.environment  }}
+        tags.datadoghq.com/service: {{.Values.name  }}
+        tags.datadoghq.com/version: {{substr 0 63 .Values.version  }}
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: '/prometheus'
+        prometheus.io/port: '8081'
+    spec:
+      {{- if .Values.dd_enabled}}
+      volumes:
+        - hostPath:
+            path: /var/run/datadog/
+          name: apmsocketpath
+      {{- end}}
+      containers:
+      - name: {{.Values.name}}
+        image: {{.Values.image}}
+        imagePullPolicy: Always
+        {{- if .Values.dd_enabled}}
+        volumeMounts:
+        - name: apmsocketpath
+          mountPath: /var/run/datadog
+        {{- end}}
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 300m
+            memory: 512Mi
+        readinessProbe:
+          httpGet:
+            path: {{.Values.readiness_path}}
+            port: {{.Values.readiness_port}}
+          initialDelaySeconds: {{.Values.readiness_initial_delay}}
+          timeoutSeconds: 10
+          periodSeconds: 20
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: {{.Values.readiness_path}}
+            port: {{.Values.readiness_port}}
+          initialDelaySeconds: {{.Values.readiness_initial_delay}}
+          timeoutSeconds: 10
+          periodSeconds: 20
+          failureThreshold: 3
+           
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        - name: admin
+          containerPort: 8081
+          protocol: TCP
+        - name: dd
+          containerPort: 8126
+          protocol: TCP
+        {{- if or .Values.env.config .Values.env.secret}}
+        envFrom:
+        {{- if .Values.env.config}}
+        - configMapRef:
+            name: {{.Values.name}}
+        {{- end}}
+        {{- if .Values.env.secret}}
+        - secretRef:
+            name: {{.Values.name}}
+        {{- end}}
+        {{- end}}

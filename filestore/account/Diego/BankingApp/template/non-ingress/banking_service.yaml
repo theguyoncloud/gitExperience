@@ -1,0 +1,54 @@
+#
+# Service targeting canary only
+#
+{{- if .Values.canary}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Values.name}}-canary
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http-canary
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: {{.Values.name}}
+    harness.io/track: canary
+---
+{{- end}}
+#
+# Service targeting stable only
+#
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Values.name}}-stable
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http-stable
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: {{.Values.name}}
+    {{- if .Values.canary}}
+    harness.io/track: stable
+    {{- end}}
+{{- if eq .Values.environment "prod" }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Values.name}}-prod
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http-canary
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: {{.Values.name}}
+{{- end}}

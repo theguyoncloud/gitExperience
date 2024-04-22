@@ -1,0 +1,15 @@
+# harness.io/skip-file-for-deploy
+apiVersion: v1
+kind: Job
+metadata:
+  name: my-curl-job
+spec:
+  template:
+    spec:
+      containers:
+      - name: my-curl-container
+        image: alpine
+        command: ["/bin/sh"]
+        args: ["-c", "container_name=$(kubectl get pods -n se-sandbox-ng-delegate -o jsonpath='{..metadata.name}' | grep 'nfs-demo' | head -n 1); kubectl exec -n se-demo-harness-ng-delegate $container_name -- curl http://localhost:8080"]
+      restartPolicy: Never
+  backoffLimit: 1

@@ -1,0 +1,20 @@
+
+# harness.io/skip-file-for-deploy
+apiVersion: ccm.harness.io/v1
+kind: AutoStoppingRule
+metadata:
+    name: {{substr 0 31 .Values.name}}
+    namespace: {{.Values.namespace}}
+    annotations:
+        harness.io/cloud-connector-id: Harness_GCP_Billing
+spec:
+    service:
+        name: {{.Values.name}}
+        port: {{int .Values.servicePort}}
+    ingress:
+        name: {{.Values.name}}
+        controllerName: nginx
+    idleTimeMins: 180
+    hideProgressPage: false
+#    host: harness-demo.site
+---
