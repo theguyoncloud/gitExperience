@@ -1,0 +1,7 @@
+service:
+  name: test_svc_ssh
+  identifier: test_svc_ssh
+  serviceDefinition:
+    type: Ssh
+    spec: {}
+  gitOpsEnabled: false
