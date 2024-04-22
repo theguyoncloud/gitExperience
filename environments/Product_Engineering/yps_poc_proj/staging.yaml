@@ -1,0 +1,7 @@
+environment:
+  name: staging
+  identifier: staging
+  accountId: 6_vVHzo9Qeu9fXvj-AcbCQ
+  orgIdentifier: Product_Engineering
+  projectIdentifier: yps_poc_proj
+  type: PreProduction
