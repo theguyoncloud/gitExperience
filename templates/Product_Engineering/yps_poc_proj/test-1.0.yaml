@@ -1,0 +1,15 @@
+template:
+  name: test
+  identifier: test
+  versionLabel: "1.0"
+  type: Step
+  projectIdentifier: yps_poc_proj
+  orgIdentifier: Product_Engineering
+  tags: {}
+  spec:
+    type: S3Upload
+    spec:
+      connectorRef: pritish_aws
+      region: us-east-1
+      bucket: test
+      sourcePath: /test1/test2
