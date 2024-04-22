@@ -1,0 +1,10 @@
+environment:
+  name: aws-preprod-restricted
+  identifier: awspreprodrestricted
+  accountId: 6_vVHzo9Qeu9fXvj-AcbCQ
+  orgIdentifier: Product_Engineering
+  projectIdentifier: yps_poc_proj
+  type: PreProduction
+  description: |-
+    Please check with Yash Singh  before using this env.--thanks
+    Yash
