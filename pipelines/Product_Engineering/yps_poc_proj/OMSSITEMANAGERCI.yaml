@@ -1,0 +1,37 @@
+pipeline:
+  name: OMS-SITEMANAGER-CI
+  identifier: OMSSITEMANAGERCI
+  projectIdentifier: yps_poc_proj
+  orgIdentifier: Product_Engineering
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: CIPHERTron
+        repoName: harness-yarn-demo
+        build: <+input>
+  stages:
+    - stage:
+        name: sitemanager_build
+        identifier: sitemanager_build
+        type: CI
+        spec:
+          cloneCodebase: true
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: Run_1
+                  identifier: Run_1
+                  spec:
+                    shell: Powershell
+                    command: Write-Host "Hello World"
+          slsa_provenance:
+            enabled: false
+          platform:
+            os: Windows
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+        description: ""
