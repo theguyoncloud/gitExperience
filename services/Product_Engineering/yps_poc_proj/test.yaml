@@ -1,0 +1,7 @@
+service:
+  name: test
+  identifier: test
+  serviceDefinition:
+    type: Ssh
+    spec: {}
+  gitOpsEnabled: false
