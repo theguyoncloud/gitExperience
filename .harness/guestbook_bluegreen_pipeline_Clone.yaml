@@ -1,0 +1,58 @@
+pipeline:
+  projectIdentifier: yps_poc_proj
+  orgIdentifier: Product_Engineering
+  tags: {}
+  stages:
+    - stage:
+        name: deploy-guestbook
+        identifier: deployguestbook
+        description: ""
+        type: Deployment
+        spec:
+          deploymentType: Kubernetes
+          service:
+            serviceRef: harnessguestbook
+          environment:
+            environmentRef: harnessdevenv_bgDemo
+            deployToAll: false
+            infrastructureDefinitions:
+              - identifier: harnessk8sinfra_yps_BGinfra
+          execution:
+            steps:
+              - stepGroup:
+                  name: test-dry-run
+                  identifier: testdryrun
+                  steps:
+                    - step:
+                        type: K8sDryRun
+                        name: K8sDryRun_1
+                        identifier: K8sDryRun_1
+                        spec: {}
+                        timeout: 10m
+                  strategy:
+                    repeat:
+                      items: <+repeat.partition>
+            rollbackSteps:
+              - step:
+                  name: Swap primary with stage service
+                  identifier: rollbackBgSwapServices
+                  type: K8sBGSwapServices
+                  timeout: 10m
+                  spec:
+                    skipDryRun: false
+        tags: {}
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: StageRollback
+        strategy:
+          repeat:
+            items:
+              - 1..1000
+            maxConcurrency: 3
+            partitionSize: 240
+            unit: Count
+  identifier: guestbook_bluegreen_pipeline_Clone
+  name: guestbook_bluegreen_pipeline - Clone
