@@ -29,6 +29,20 @@ pipeline:
                         identifier: K8sDryRun_1
                         spec: {}
                         timeout: 10m
+                    - step:
+                        type: ShellScript
+                        name: ShellScript_1
+                        identifier: ShellScript_1
+                        spec:
+                          shell: Bash
+                          executionTarget: {}
+                          source:
+                            type: Inline
+                            spec:
+                              script: echo <+repeat.item>
+                          environmentVariables: []
+                          outputVariables: []
+                        timeout: 10m
                   strategy:
                     repeat:
                       items: <+repeat.partition>
