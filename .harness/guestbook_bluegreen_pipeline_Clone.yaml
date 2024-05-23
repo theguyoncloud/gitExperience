@@ -28,7 +28,7 @@ pipeline:
                         name: K8sDryRun_1
                         identifier: K8sDryRun_1
                         spec: {}
-                        timeout: 10m
+                        timeout: 10s
                     - step:
                         type: ShellScript
                         name: ShellScript_1
