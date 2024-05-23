@@ -42,7 +42,10 @@ pipeline:
                           source:
                             type: Inline
                             spec:
-                              script: echo <+repeat.partition.item>
+                              script: |-
+
+                                exit 1
+                                echo <+repeat.partition.item>
                           environmentVariables: []
                           outputVariables: []
                         timeout: 10m
