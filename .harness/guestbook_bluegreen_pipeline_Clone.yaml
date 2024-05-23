@@ -70,3 +70,15 @@ pipeline:
             unit: Count
   identifier: guestbook_bluegreen_pipeline_Clone
   name: guestbook_bluegreen_pipeline - Clone
+  notificationRules:
+    - name: test_step_notify
+      identifier: test_step_notify
+      pipelineEvents:
+        - type: AllEvents
+      notificationMethod:
+        type: Email
+        spec:
+          userGroups: []
+          recipients:
+            - yash.singh@harness.io
+      enabled: true
