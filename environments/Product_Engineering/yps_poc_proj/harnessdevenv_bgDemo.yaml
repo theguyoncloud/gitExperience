@@ -6,4 +6,3 @@ environment:
   type: PreProduction
   orgIdentifier: Product_Engineering
   projectIdentifier: yps_poc_proj
-  variables: []
